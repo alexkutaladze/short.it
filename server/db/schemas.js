@@ -19,10 +19,6 @@ const userSchema = new mongoose.Schema({
 	updatedAt: Date,
 	createdURLs: [],
 	visitedURLs: [],
-	tokenVersion: {
-		type: Number,
-		default: 0,
-	},
 });
 
 exports.shortURL = mongoose.model("shortURL", shortURLSchema);

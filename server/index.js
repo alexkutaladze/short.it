@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const { verify } = require("jsonwebtoken");
 const app = express();
 const port = 4000;
+const cors = require("cors");
 
 const serverDB = new DBConnection();
 serverDB.initializeConnection();
@@ -17,10 +18,16 @@ serverDB.initializeConnection();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+	})
+);
 
 app.post("/createNew", async (req, res) => {
 	const requestBody = req.body;
 	let url = requestBody.url;
+
 	if (!url.includes("https://")) {
 		url = `https://${url}`;
 	}
