@@ -13,8 +13,16 @@ const shortURLSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
 	userName: String,
 	fullName: String,
+	email: String,
+	password: String,
 	createdAt: Date,
 	updatedAt: Date,
+	createdURLs: [],
+	visitedURLs: [],
+	tokenVersion: {
+		type: Number,
+		default: 0,
+	},
 });
 
 exports.shortURL = mongoose.model("shortURL", shortURLSchema);

@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const { randomString } = require("./funtions");
-const { shortURL } = require("./schemas");
-const uri =
-	"mongodb+srv://mongoAlex:mongoNewPassword@urls.umahx.mongodb.net/shortit?retryWrites=true&w=majority";
+const { shortURL, user } = require("./schemas");
+const { hash } = require("bcryptjs");
+const uri = `mongodb+srv://mongoAlex:${process.env.DB_PASSWORD}@urls.umahx.mongodb.net/shortit?retryWrites=true&w=majority`;
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 let db = mongoose.connection;
@@ -31,7 +31,7 @@ exports.DBConnection = class DBConnection {
 		return new Promise((resolve, reject) => {
 			newEntry.save(err => {
 				if (err) reject("Error occurred while creating a new entry");
-				resolve("New entry added!");
+				resolve(newEntry);
 			});
 		});
 	}
@@ -55,6 +55,33 @@ exports.DBConnection = class DBConnection {
 					reject("Error occurred while creating a new entry");
 				}
 				resolve("New entry added!");
+			});
+		});
+	}
+
+	async registerUser(name, username, email, password) {
+		const regex =
+			/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+
+		const hashedPassword = await hash(password, 12);
+
+		return new Promise((resolve, reject) => {
+			if (!regex.test(email)) reject("Invalid email");
+			const newUser = new user({
+				userName: username,
+				fullName: name,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				email: email,
+				password: hashedPassword,
+				createdURLs: new Array(),
+				visitedURLs: new Array(),
+			});
+			newUser.save(err => {
+				if (err) {
+					reject(err);
+				}
+				resolve({ status: "OK", createdUser: newUser });
 			});
 		});
 	}
