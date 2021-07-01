@@ -11,15 +11,13 @@ exports.randomString = function (length) {
 };
 
 exports.createAccessToken = function (user) {
-	return sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET, {
-		expiresIn: "15m",
-	});
+	return sign({ username: user.userName }, process.env.ACCESS_TOKEN_SECRET);
 };
 
-exports.createRefreshToken = function (user) {
-	return sign(
-		{ userId: user._id, tokenVersion: user.tokenVersion },
-		process.env.REFRESH_TOKEN_SECRET,
-		{ expiresIn: "7d" }
-	);
-};
+// exports.createRefreshToken = function (user) {
+// 	return sign(
+// 		{ userId: user._id, tokenVersion: user.tokenVersion },
+// 		process.env.REFRESH_TOKEN_SECRET,
+// 		{ expiresIn: "7d" }
+// 	);
+// };

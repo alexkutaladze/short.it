@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { randomString } = require("./funtions");
 const { shortURL, user } = require("./schemas");
 const { hash } = require("bcryptjs");
+const verify = require("jsonwebtoken/verify");
 const uri = `mongodb+srv://mongoAlex:${process.env.DB_PASSWORD}@urls.umahx.mongodb.net/shortit?retryWrites=true&w=majority`;
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -17,20 +18,53 @@ exports.DBConnection = class DBConnection {
 		db.on("open", () => console.log("Database connection established."));
 	}
 
-	createNewShortURL(destination, user) {
-		user = user || "anonymous";
-		const newEntry = new shortURL({
-			destination: destination,
-			shortened: randomString(6),
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			visitCount: 0,
-			creatorId: user,
-		});
+	async createNewShortURL(destination, userId) {
+		userId = userId || "anonymous";
+		let author;
+
+		if (userId !== "anonymous") {
+			let payload;
+			try {
+				payload = verify(userId, process.env.ACCESS_TOKEN_SECRET);
+			} catch (error) {
+				console.log(error);
+				reject("Invalid token");
+			}
+			const findUser = await user.findOne({ userName: payload.username }, (err, doc) => {
+				author = doc;
+			});
+		}
+
+		const query = shortURL.find({ destination: destination });
 
 		return new Promise((resolve, reject) => {
-			newEntry.save(err => {
+			if (query.length > 0) {
+				return resolve(query[0]);
+			}
+
+			const newEntry = new shortURL({
+				destination: destination,
+				shortened: randomString(6),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				visitCount: 0,
+				creatorId: author.userName,
+			});
+
+			newEntry.save(async err => {
 				if (err) reject("Error occurred while creating a new entry");
+				const updateCreatedURL = await user.updateOne(
+					{ userName: author.userName },
+					{
+						$addToSet: {
+							createdURLs: newEntry.shortened,
+						},
+					},
+					(err, res) => {
+						if (err) reject(err);
+						console.log(res);
+					}
+				);
 				resolve(newEntry);
 			});
 		});

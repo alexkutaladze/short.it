@@ -1,39 +1,45 @@
-import React, { useState, useEffect } from "react";
-import {
-	Body,
-	Sidebar,
-	Iconwrapper,
-	Main,
-	Header,
-	LinkInputContainer,
-	LinkInput,
-	SubmitButton,
-	GeneratedLink,
-} from "./style/Homepage";
-import Logo from "../../Logo";
-import { FaUserAlt } from "react-icons/fa";
+import React, { useContext, useEffect, useState } from "react";
 import { BsLink } from "react-icons/bs";
-import { FiLogOut } from "react-icons/fi";
+import { UserContext } from "../../Context/UserContext";
 import { IGeneratedURL } from "../../types/IGeneratedURL";
+import {
+	Container,
+	GeneratedLink,
+	Header,
+	LinkInput,
+	LinkInputContainer,
+	SubmitButton,
+} from "./style/Homepage";
+import { Iconwrapper } from "../../Components/Body/styles/Body";
+import Body from "../../Components/Body/Body";
+import { RouteComponentProps } from "react-router-dom";
 
-const Homepage = () => {
+const Homepage: React.FC<RouteComponentProps> = ({ history }) => {
 	const [generate, setGenerate] = useState("");
 	const [generatedURL, setGeneratedURL] = useState<IGeneratedURL>();
+	const [user] = useContext(UserContext);
 
-	const generateURL = async () => {
+	useEffect(() => {
+		if (!user) history.replace("/user");
+	}, []);
+
+	const generateURL = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		e.preventDefault();
+		const jwt = window.localStorage.getItem("jid");
 		const requestBody = {
 			url: generate,
 		};
-
 		await fetch("http://localhost:4000/createNew", {
 			method: "POST",
 			body: JSON.stringify(requestBody),
 			headers: {
 				"Content-type": "application/json",
+				authorization: `bearer ${jwt}`,
 			},
 		})
 			.then(value => value.json())
 			.then(data => {
+				console.log("data", data);
 				let properURL =
 					data.destination.includes("https://") || data.destination.includes("http://")
 						? data.destination
@@ -53,26 +59,27 @@ const Homepage = () => {
 			.catch(err => console.error(err));
 	};
 
+	useEffect(() => {
+		if (!user) {
+			fetch("http://localhost:4000/auth", {
+				headers: {
+					authorization: `bearer ${window.localStorage.getItem("jid")}`,
+				},
+			})
+				.then(values => values.json())
+				.then(data => console.log(data))
+				.catch(e => console.log(e));
+		}
+	}, []);
+
 	return (
 		<Body>
-			<Sidebar>
-				<Logo />
-				<Iconwrapper title="User">
-					<FaUserAlt size={50} />
-				</Iconwrapper>
-				<Iconwrapper title="URL">
-					<BsLink size={50} />
-				</Iconwrapper>
-				<Iconwrapper title="Log out">
-					<FiLogOut size={50} />
-				</Iconwrapper>
-			</Sidebar>
-			<Main>
+			<Container>
 				<Header>Short.it</Header>
 				<LinkInputContainer>
 					{generatedURL ? (
 						<GeneratedLink
-							href={`http://localhost:4000/visit/${generatedURL.shortened}`}
+							href={`http://localhost:4000/visit?short=${generatedURL.shortened}&by=${user.userName}`}
 							target="_blank"
 						>
 							{`short.it/${generatedURL.shortened}`}
@@ -90,8 +97,8 @@ const Homepage = () => {
 						</>
 					)}
 				</LinkInputContainer>
-				<SubmitButton onClick={generateURL}>Generate</SubmitButton>
-			</Main>
+				<SubmitButton onClick={e => generateURL(e)}>Generate</SubmitButton>
+			</Container>
 		</Body>
 	);
 };
