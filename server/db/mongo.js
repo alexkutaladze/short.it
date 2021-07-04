@@ -35,7 +35,7 @@ exports.DBConnection = class DBConnection {
 			});
 		}
 
-		const query = shortURL.find({ destination: destination });
+		const query = await shortURL.find({ destination: destination });
 
 		return new Promise((resolve, reject) => {
 			if (query.length > 0) {

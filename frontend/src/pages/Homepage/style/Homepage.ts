@@ -11,6 +11,7 @@ export const Header = styled.div`
 
 export const LinkInputContainer = styled.div`
 	margin-top: 150px;
+	position: relative;
 	height: 80px;
 	width: 550px;
 	border-radius: 50px;

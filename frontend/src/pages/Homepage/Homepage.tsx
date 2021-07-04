@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { BsLink } from "react-icons/bs";
+import { GrClose } from "react-icons/gr";
 import { UserContext } from "../../Context/UserContext";
 import { IGeneratedURL } from "../../types/IGeneratedURL";
 import {
@@ -65,12 +66,27 @@ const Homepage: React.FC<RouteComponentProps> = ({ history }) => {
 				<Header>Short.it</Header>
 				<LinkInputContainer>
 					{generatedURL ? (
-						<GeneratedLink
-							href={`http://localhost:4000/visit?short=${generatedURL.shortened}&by=${user.userName}`}
-							target="_blank"
-						>
-							{`short.it/${generatedURL.shortened}`}
-						</GeneratedLink>
+						<>
+							<GeneratedLink
+								href={`http://localhost:4000/visit?short=${generatedURL.shortened}&by=${user.userName}`}
+								target="_blank"
+							>
+								{`short.it/${generatedURL.shortened}`}
+							</GeneratedLink>
+							<GrClose
+								style={{
+									position: "absolute",
+									right: 30,
+									top: "50%",
+									transform: "translateY(-50%)",
+									cursor: "pointer",
+								}}
+								onClick={() => {
+									setGeneratedURL(undefined);
+									setGenerate("");
+								}}
+							/>
+						</>
 					) : (
 						<>
 							<LinkInput
