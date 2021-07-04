@@ -59,19 +59,6 @@ const Homepage: React.FC<RouteComponentProps> = ({ history }) => {
 			.catch(err => console.error(err));
 	};
 
-	useEffect(() => {
-		if (!user) {
-			fetch("http://localhost:4000/auth", {
-				headers: {
-					authorization: `bearer ${window.localStorage.getItem("jid")}`,
-				},
-			})
-				.then(values => values.json())
-				.then(data => console.log(data))
-				.catch(e => console.log(e));
-		}
-	}, []);
-
 	return (
 		<Body>
 			<Container>

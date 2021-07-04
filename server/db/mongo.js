@@ -30,7 +30,7 @@ exports.DBConnection = class DBConnection {
 				console.log(error);
 				reject("Invalid token");
 			}
-			const findUser = await user.findOne({ userName: payload.username }, (err, doc) => {
+			await user.findOne({ userName: payload.username }, (err, doc) => {
 				author = doc;
 			});
 		}
@@ -53,7 +53,7 @@ exports.DBConnection = class DBConnection {
 
 			newEntry.save(async err => {
 				if (err) reject("Error occurred while creating a new entry");
-				const updateCreatedURL = await user.updateOne(
+				await user.updateOne(
 					{ userName: author.userName },
 					{
 						$addToSet: {
@@ -117,6 +117,19 @@ exports.DBConnection = class DBConnection {
 				}
 				resolve({ status: "OK", createdUser: newUser });
 			});
+		});
+	}
+
+	async getLinkStats(links) {
+		return new Promise(async (resolve, reject) => {
+			let linksWithStats = new Array();
+			for await (link of links) {
+				await shortURL.findOne({ shortened: link }, (err, doc) => {
+					if (err) reject(err);
+					linksWithStats.push(doc);
+				});
+			}
+			resolve(linksWithStats);
 		});
 	}
 };

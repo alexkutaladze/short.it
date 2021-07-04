@@ -119,7 +119,7 @@ app.post("/register", async (req, res) => {
 			.then(values => res.send(values))
 			.catch(err => res.send(err));
 	} else {
-		res.send("User already exists with specified email or username");
+		res.send({ ok: false, error: "User already exists with specified email or username" });
 	}
 });
 
@@ -164,14 +164,24 @@ app.post("/getLinkAnalytics", async (req, res) => {
 	const requestBody = req.body;
 
 	let linkAnalytics = [];
-	for (item of requestBody.urls) {
-		await shortURL.findOne({ shortened: item }, (err, doc) => {
-			if (err) return res.send("Error while fetching URL analytics");
-			linkAnalytics.push(doc);
-		});
-	}
+	await Promise.all(
+		requestBody.urls.map(async item => {
+			await shortURL.findOne({ shortened: item }, (err, doc) => {
+				linkAnalytics.push(doc);
+			});
+		})
+	).then(() => res.send(linkAnalytics));
+});
 
-	return res.send(linkAnalytics);
+app.get("/mostVisitedLinks", async (req, res) => {
+	await shortURL
+		.find({})
+		.sort("-visitCount")
+		.limit(5)
+		.exec((err, docs) => {
+			if (err) res.send(err);
+			res.send(docs);
+		});
 });
 
 app.listen(port, () => {

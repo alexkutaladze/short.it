@@ -27,7 +27,7 @@ const BodyContainer: React.FC = ({ children }) => {
 						<FaUserAlt size={50} />
 					</Iconwrapper>
 				</Link>
-				<Link to="/">
+				<Link to="/stats">
 					<Iconwrapper title="URL">
 						<BsLink size={50} />
 					</Iconwrapper>

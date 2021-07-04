@@ -1,69 +1,40 @@
-import React, { useContext, useEffect } from "react";
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { FaIdBadge } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Body from "../../Components/Body/Body";
+import LinkComponent from "../../Components/LinkComponent/LinkComponent";
 import { UserContext } from "../../Context/UserContext";
-import { FaIdBadge } from "react-icons/fa";
+import Theme from "../../theme.json";
+import { IGeneratedURL } from "../../types/IGeneratedURL";
+import { IUser } from "../../types/IUser";
 import {
-	InputLabel,
-	Input,
-	Container,
-	InputContainer,
-	AuthButton,
 	AuthAltText,
+	AuthButton,
 	AuthText,
+	Container,
+	Input,
+	InputContainer,
+	InputLabel,
+	UserAnalytics,
+	UserAnalyticsContainer,
 	UserInfoContainer,
 	UserTextContainer,
-	UserAnalyticsContainer,
-	UserAnalytics,
 } from "./styles/User";
-import Theme from "../../theme.json";
-import { IUser } from "../../types/IUser";
-import { IGeneratedURL } from "../../types/IGeneratedURL";
 
 const User = () => {
 	const [user, setUser] = useContext(UserContext);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
-	const [loading, setLoading] = useState(true);
-	const [linkStatistics, setLinkStatistics] = useState<IGeneratedURL[]>();
+	const [createdLinkStatistics, setCreatedLinkStatistics] = useState<IGeneratedURL[]>();
+	const [visitedLinkStatistics, setVisitedLinkStatistics] = useState<IGeneratedURL[]>();
+	const [linksLoading, setLinksLoading] = useState(true);
 
 	useEffect(() => {
-		const jwt = window.localStorage.getItem("jid");
-
-		if (jwt) {
-			fetch("http://localhost:4000/auth", {
-				credentials: "include",
-				method: "GET",
-				headers: {
-					authorization: `bearer ${jwt}`,
-				},
-			})
-				.then(values => values.json())
-				.then(data => {
-					if (data.ok) {
-						let fetchedUser: IUser = {
-							email: data.user.email,
-							createdAt: new Date(data.user.createdAt),
-							userName: data.user.userName,
-							updatedAt: new Date(data.user.updatedAt),
-							fullName: data.user.fullName,
-							createdURLs: data.user.createdURLs,
-							visitedURLs: data.user.visitedURLs,
-						};
-						setUser(fetchedUser);
-						setLoading(false);
-					}
-				})
-				.catch(e => console.log(e));
-		} else {
-			setLoading(false);
+		if (!user && !user?.createdURLs && !user?.visitedURLs) {
+			setLinksLoading(false);
+			return;
 		}
-	}, []);
-
-	useEffect(() => {
-		if (!user && !user?.createdURLs) return;
 		(async () => {
 			const body = {
 				urls: user.createdURLs,
@@ -76,9 +47,27 @@ const User = () => {
 				body: JSON.stringify(body),
 			})
 				.then(values => values.json())
-				.then(data => setLinkStatistics(data))
+				.then(data => setCreatedLinkStatistics(data))
 				.catch(e => console.log(e));
 		})();
+
+		(async () => {
+			const body = {
+				urls: user.visitedURLs,
+			};
+			await fetch("http://localhost:4000/getLinkAnalytics", {
+				method: "POST",
+				headers: {
+					"Content-type": "application/json",
+				},
+				body: JSON.stringify(body),
+			})
+				.then(values => values.json())
+				.then(data => setVisitedLinkStatistics(data))
+				.catch(e => console.log(e));
+		})();
+
+		setLinksLoading(false);
 	}, [user]);
 
 	const login = async () => {
@@ -104,7 +93,7 @@ const User = () => {
 			.catch(e => console.error(e));
 	};
 
-	if (loading) return <Body>loading...</Body>;
+	if (linksLoading) return <Body>loading...</Body>;
 
 	return (
 		<Body>
@@ -119,20 +108,27 @@ const User = () => {
 					</UserInfoContainer>
 					<UserAnalyticsContainer>
 						<UserAnalytics>
-							<p>Created URLs</p>
-							{linkStatistics ? (
-								linkStatistics.map(item => (
-									<a
-										key={item._id}
-										href={`http://localhost:4000/visit?short=${item.shortened}&by=${user.userName}`}
-										target="_blank"
-										style={{ display: "block" }}
-									>
-										{item.shortened}
-									</a>
+							<h3>Created URLs</h3>
+							{createdLinkStatistics ? (
+								createdLinkStatistics.map(item => (
+									<LinkComponent key={item._id} user={user} short={item} />
 								))
-							) : (
+							) : linksLoading ? (
 								<p>No URLs created (so far &#128521;)</p>
+							) : (
+								<p>Loading...</p>
+							)}
+						</UserAnalytics>
+						<UserAnalytics>
+							<h3>Visited URLs</h3>
+							{visitedLinkStatistics ? (
+								visitedLinkStatistics.map(item => (
+									<LinkComponent key={item._id} user={user} short={item} />
+								))
+							) : linksLoading ? (
+								<p>No URLs visited (so far &#128521;)</p>
+							) : (
+								<p>Loading...</p>
 							)}
 						</UserAnalytics>
 					</UserAnalyticsContainer>

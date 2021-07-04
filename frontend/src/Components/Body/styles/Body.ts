@@ -1,11 +1,11 @@
 import styled from "styled-components/macro";
 
 export const Body = styled.div`
-	min-height: 100vh;
 	width: 100vw;
 	background: ${props => props.theme.body};
 	display: flex;
 	flex-direction: row;
+	overflow-x: hidden;
 `;
 
 export const Iconwrapper = styled.div`
@@ -27,11 +27,11 @@ export const Sidebar = styled.div`
 	height: 100vh;
 	width: 10%;
 	background: ${props => props.theme.sidebar};
+	position: fixed;
 
 	& > svg {
 		cursor: pointer;
 	}
-	position: relative;
 
 	& > ${Iconwrapper}:last-of-type {
 		position: absolute;
@@ -40,5 +40,6 @@ export const Sidebar = styled.div`
 `;
 export const Main = styled.div`
 	width: 90%;
-	height: 100vh;
+	min-height: 100vh;
+	margin-left: 10%;
 `;

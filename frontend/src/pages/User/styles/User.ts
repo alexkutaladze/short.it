@@ -98,5 +98,69 @@ export const UserAnalyticsContainer = styled.div`
 
 export const UserAnalytics = styled.div`
 	flex: 1;
-	padding: 0 20px;
+	padding: 0 10%;
+
+	& h3 {
+		color: ${props => props.theme.sidebar};
+	}
+`;
+
+export const Analytics = styled.div`
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 400px;
+	height: 60px;
+	border-radius: 20px;
+	background: ${props => props.theme.icon};
+	padding: 10px;
+	margin-bottom: 20px;
+
+	& > svg {
+		color: ${props => props.theme.sidebar};
+		margin-right: 20px;
+	}
+`;
+
+export const AnalyticsWebsite = styled.div`
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	justify-content: space-between;
+	max-width: 200px;
+	overflow: hidden;
+
+	& > p {
+		padding: 0;
+		margin: 0;
+		max-width: 100%;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+
+	color: ${props => props.theme.sidebar};
+	font-weight: 500;
+`;
+
+export const AnalyticsVisits = styled.div`
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	justify-content: space-between;
+	text-align: center;
+	margin-left: auto;
+	margin-right: 20px;
+
+	& > p {
+		padding: 0;
+		margin: 0;
+
+	}
+
+	& span {
+			font-size: 36px;
+			font-weight: 700;
+		}
+	}
 `;
