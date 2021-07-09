@@ -31,9 +31,9 @@ function App() {
 				if (data.ok) {
 					let fetchedUser: IUser = {
 						email: data.user.email,
-						createdAt: new Date(data.user.createdAt),
+						createdAt: data.user.createdAt,
 						userName: data.user.userName,
-						updatedAt: new Date(data.user.updatedAt),
+						updatedAt: data.user.updatedAt,
 						fullName: data.user.fullName,
 						createdURLs: data.user.createdURLs,
 						visitedURLs: data.user.visitedURLs,

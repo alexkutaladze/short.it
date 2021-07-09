@@ -12,6 +12,7 @@ import {
 	AuthButton,
 	AuthText,
 	Container,
+	ErrorText,
 	Input,
 	InputContainer,
 	InputLabel,
@@ -21,10 +22,20 @@ import {
 	UserTextContainer,
 } from "./styles/User";
 
+interface ErrorProps {
+	username: boolean;
+	password: boolean;
+}
+
 const User = () => {
 	const [user, setUser] = useContext(UserContext);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
+	const [validationErrors, setValidationErrors] = useState<ErrorProps>({
+		username: false,
+		password: false,
+	});
+	const [loginAttempt, setLoginAttempt] = useState(false);
 	const [error, setError] = useState("");
 	const [createdLinkStatistics, setCreatedLinkStatistics] = useState<IGeneratedURL[]>();
 	const [visitedLinkStatistics, setVisitedLinkStatistics] = useState<IGeneratedURL[]>();
@@ -48,7 +59,7 @@ const User = () => {
 			})
 				.then(values => values.json())
 				.then(data => setCreatedLinkStatistics(data))
-				.catch(e => console.log(e));
+				.catch(e => alert(e));
 
 			const visitedBody = {
 				urls: user.visitedURLs,
@@ -70,7 +81,24 @@ const User = () => {
 		})();
 	}, [user]);
 
+	useEffect(() => {
+		if (!loginAttempt) return;
+		setValidationErrors({
+			username: !(username.length > 0),
+			password: !(password.length > 0),
+		});
+	}, [username, password]);
+
 	const login = async () => {
+		if (!loginAttempt) setLoginAttempt(true);
+		if (!username || !password) {
+			setValidationErrors({
+				username: !username,
+				password: !password,
+			});
+			return;
+		}
+
 		const body = {
 			username,
 			password,
@@ -103,7 +131,7 @@ const User = () => {
 						<FaIdBadge size={150} color={Theme.sidebar} />
 						<UserTextContainer>
 							<p>{user.userName}</p>
-							<p>Member since {user.createdAt.toLocaleDateString()}</p>
+							<p>Member since {new Date(user.createdAt).toLocaleDateString()}</p>
 						</UserTextContainer>
 					</UserInfoContainer>
 					<UserAnalyticsContainer>
@@ -142,6 +170,7 @@ const User = () => {
 							<InputContainer>
 								<InputLabel>Username</InputLabel>
 								<Input value={username} onChange={e => setUsername(e.target.value)} />
+								{validationErrors.username && <ErrorText>Please provide a username</ErrorText>}
 							</InputContainer>
 							<InputContainer>
 								<InputLabel>Password</InputLabel>
@@ -150,6 +179,7 @@ const User = () => {
 									value={password}
 									onChange={e => setPassword(e.target.value)}
 								/>
+								{validationErrors.password && <ErrorText>Please provide a password</ErrorText>}
 							</InputContainer>
 							<AuthButton type="submit" onClick={login}>
 								Login

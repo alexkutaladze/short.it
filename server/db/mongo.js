@@ -115,7 +115,7 @@ exports.DBConnection = class DBConnection {
 				if (err) {
 					reject(err);
 				}
-				resolve({ status: "OK", createdUser: newUser });
+				resolve({ ok: true, createdUser: newUser });
 			});
 		});
 	}

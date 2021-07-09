@@ -164,3 +164,8 @@ export const AnalyticsVisits = styled.div`
 		}
 	}
 `;
+
+export const ErrorText = styled.p`
+	color: red;
+	padding-left: 12.5px;
+`;

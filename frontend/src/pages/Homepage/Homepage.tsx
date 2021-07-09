@@ -101,7 +101,11 @@ const Homepage: React.FC<RouteComponentProps> = ({ history }) => {
 						</>
 					)}
 				</LinkInputContainer>
-				<SubmitButton onClick={e => generateURL(e)}>Generate</SubmitButton>
+				<SubmitButton
+					onClick={e => (generate ? generateURL(e) : alert("Please provide a valid URL"))}
+				>
+					Generate
+				</SubmitButton>
 			</Container>
 		</Body>
 	);

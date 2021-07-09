@@ -69,6 +69,10 @@ export const SubmitButton = styled.button`
 	&:hover {
 		cursor: pointer;
 	}
+
+	&:active {
+		transform: scale(0.98);
+	}
 `;
 
 export const GeneratedLink = styled.a`
