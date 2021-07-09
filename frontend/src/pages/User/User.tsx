@@ -36,7 +36,7 @@ const User = () => {
 			return;
 		}
 		(async () => {
-			const body = {
+			const createdBody = {
 				urls: user.createdURLs,
 			};
 			await fetch("http://localhost:4000/getLinkAnalytics", {
@@ -44,15 +44,13 @@ const User = () => {
 				headers: {
 					"Content-type": "application/json",
 				},
-				body: JSON.stringify(body),
+				body: JSON.stringify(createdBody),
 			})
 				.then(values => values.json())
 				.then(data => setCreatedLinkStatistics(data))
 				.catch(e => console.log(e));
-		})();
 
-		(async () => {
-			const body = {
+			const visitedBody = {
 				urls: user.visitedURLs,
 			};
 			await fetch("http://localhost:4000/getLinkAnalytics", {
@@ -60,14 +58,16 @@ const User = () => {
 				headers: {
 					"Content-type": "application/json",
 				},
-				body: JSON.stringify(body),
+				body: JSON.stringify(visitedBody),
 			})
 				.then(values => values.json())
-				.then(data => setVisitedLinkStatistics(data))
+				.then(data => {
+					setVisitedLinkStatistics(data);
+				})
 				.catch(e => console.log(e));
-		})();
 
-		setLinksLoading(false);
+			setLinksLoading(false);
+		})();
 	}, [user]);
 
 	const login = async () => {
@@ -109,22 +109,24 @@ const User = () => {
 					<UserAnalyticsContainer>
 						<UserAnalytics>
 							<h3>Created URLs</h3>
-							{createdLinkStatistics ? (
-								createdLinkStatistics.map(item => (
-									<LinkComponent key={item._id} user={user} short={item} />
-								))
-							) : linksLoading ? (
+							{linksLoading ? (
 								<p>No URLs created (so far &#128521;)</p>
+							) : createdLinkStatistics ? (
+								createdLinkStatistics.map((item, index) => {
+									if (item === null) return;
+									return <LinkComponent key={item._id} user={user} short={item} />;
+								})
 							) : (
-								<p>Loading...</p>
+								<p>No URLs created (so far &#128521;)</p>
 							)}
 						</UserAnalytics>
 						<UserAnalytics>
 							<h3>Visited URLs</h3>
 							{visitedLinkStatistics ? (
-								visitedLinkStatistics.map(item => (
-									<LinkComponent key={item._id} user={user} short={item} />
-								))
+								visitedLinkStatistics.map((item, index) => {
+									if (item === null) return;
+									return <LinkComponent key={item._id} user={user} short={item} />;
+								})
 							) : linksLoading ? (
 								<p>No URLs visited (so far &#128521;)</p>
 							) : (

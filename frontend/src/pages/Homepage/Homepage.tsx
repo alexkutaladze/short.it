@@ -74,6 +74,7 @@ const Homepage: React.FC<RouteComponentProps> = ({ history }) => {
 								{`short.it/${generatedURL.shortened}`}
 							</GeneratedLink>
 							<GrClose
+								size={25}
 								style={{
 									position: "absolute",
 									right: 30,
