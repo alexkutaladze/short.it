@@ -3,7 +3,6 @@ import { IGeneratedURL } from "../../types/IGeneratedURL";
 import { IUser } from "../../types/IUser";
 import { Analytics, AnalyticsVisits, AnalyticsWebsite } from "../../pages/User/styles/User";
 import { BiGlobe } from "react-icons/bi";
-import { Link } from "react-router-dom";
 
 interface Props {
 	short: IGeneratedURL;
@@ -19,6 +18,7 @@ const LinkComponent: React.FC<Props> = ({ short, user }) => {
 				<a
 					href={`http://localhost:4000/visit?short=${short.shortened}&by=${user.userName}`}
 					target="_blank"
+					rel="noreferrer"
 					style={{ display: "block" }}
 				>
 					{short.shortened}

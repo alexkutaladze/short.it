@@ -6,7 +6,6 @@ import LinkComponent from "../../Components/LinkComponent/LinkComponent";
 import { UserContext } from "../../Context/UserContext";
 import Theme from "../../theme.json";
 import { IGeneratedURL } from "../../types/IGeneratedURL";
-import { IUser } from "../../types/IUser";
 import {
 	AuthAltText,
 	AuthButton,
@@ -87,7 +86,7 @@ const User = () => {
 			username: !(username.length > 0),
 			password: !(password.length > 0),
 		});
-	}, [username, password]);
+	}, [username, password, loginAttempt]);
 
 	const login = async () => {
 		if (!loginAttempt) setLoginAttempt(true);
@@ -116,6 +115,9 @@ const User = () => {
 				if (data.ok) {
 					window.localStorage.setItem("jid", data.accessToken);
 					setUser(data.user);
+					setUsername("");
+					setPassword("");
+					setLoginAttempt(false);
 				} else setError("Incorrect credentials");
 			})
 			.catch(e => console.error(e));
@@ -141,7 +143,7 @@ const User = () => {
 								<p>No URLs created (so far &#128521;)</p>
 							) : createdLinkStatistics ? (
 								createdLinkStatistics.map((item, index) => {
-									if (item === null) return;
+									if (item === null) return null;
 									return <LinkComponent key={item._id} user={user} short={item} />;
 								})
 							) : (
@@ -152,7 +154,7 @@ const User = () => {
 							<h3>Visited URLs</h3>
 							{visitedLinkStatistics ? (
 								visitedLinkStatistics.map((item, index) => {
-									if (item === null) return;
+									if (item === null) return null;
 									return <LinkComponent key={item._id} user={user} short={item} />;
 								})
 							) : linksLoading ? (

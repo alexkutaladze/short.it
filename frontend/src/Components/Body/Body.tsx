@@ -32,9 +32,11 @@ const BodyContainer: React.FC = ({ children }) => {
 						<BsLink size={50} />
 					</Iconwrapper>
 				</Link>
-				<Iconwrapper title="Log out" onClick={logout}>
-					<FiLogOut size={50} />
-				</Iconwrapper>
+				{user && (
+					<Iconwrapper title="Log out" onClick={logout}>
+						<FiLogOut size={50} />
+					</Iconwrapper>
+				)}
 			</Sidebar>
 			<Main>{children}</Main>
 		</Body>

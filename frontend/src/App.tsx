@@ -46,7 +46,7 @@ function App() {
 				console.error(e);
 				setLoading(false);
 			});
-	}, []);
+	}, [user]);
 
 	if (loading)
 		return (

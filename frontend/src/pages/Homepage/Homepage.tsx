@@ -22,7 +22,7 @@ const Homepage: React.FC<RouteComponentProps> = ({ history }) => {
 
 	useEffect(() => {
 		if (!user) history.replace("/user");
-	}, []);
+	}, [history, user]);
 
 	const generateURL = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.preventDefault();
