@@ -18,6 +18,30 @@ exports.DBConnection = class DBConnection {
 		db.on("open", () => console.log("Database connection established."));
 	}
 
+	async createNewAnonUrl(destination) {
+		const query = await shortURL.find({ destination: destination });
+
+		return new Promise((res, rej) => {
+			if (query.length > 0) {
+				return res(query[0]);
+			}
+
+			const newEntry = new shortURL({
+				destination: destination,
+				shortened: randomString(6),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				visitCount: 0,
+				creatorId: author.userName,
+			});
+
+			newEntry.save(async err => {
+				if (err) rej("Error occurred while creating a new entry");
+				res(newEntry);
+			});
+		});
+	}
+
 	async createNewShortURL(destination, userId) {
 		userId = userId || "anonymous";
 		let author;
@@ -66,29 +90,6 @@ exports.DBConnection = class DBConnection {
 					}
 				);
 				resolve(newEntry);
-			});
-		});
-	}
-
-	createNewExpiringURL(destination, expiry, user) {
-		user = user || "anonymous";
-		const newEntry = new shortURL({
-			destination: destination,
-			shortened: randomString(6),
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			visitCount: 0,
-			creatorId: user,
-			expiryDate: new Date(expiry),
-		});
-
-		return new Promise((resolve, reject) => {
-			newEntry.save(err => {
-				if (err) {
-					console.log(err);
-					reject("Error occurred while creating a new entry");
-				}
-				resolve("New entry added!");
 			});
 		});
 	}

@@ -16,7 +16,9 @@ const LinkComponent: React.FC<Props> = ({ short, user }) => {
 			<AnalyticsWebsite>
 				<p>{short.destination}</p>
 				<a
-					href={`http://localhost:4000/visit?short=${short.shortened}&by=${user.userName}`}
+					href={`http://localhost:4000/visit?short=${short.shortened}&by=${
+						user ? user.userName : "anon"
+					}`}
 					target="_blank"
 					rel="noreferrer"
 					style={{ display: "block" }}

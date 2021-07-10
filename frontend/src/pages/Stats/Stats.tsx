@@ -5,7 +5,7 @@ import LinkComponent from "../../Components/LinkComponent/LinkComponent";
 import { UserContext } from "../../Context/UserContext";
 import { IGeneratedURL } from "../../types/IGeneratedURL";
 
-const Stats: React.FC<RouteComponentProps> = ({ location }) => {
+const Stats: React.FC<RouteComponentProps> = ({ history }) => {
 	const [mostVisited, setMostVisited] = useState<IGeneratedURL[]>();
 	const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,9 @@ const Stats: React.FC<RouteComponentProps> = ({ location }) => {
 				console.log(e);
 				setLoading(false);
 			});
-	}, []);
+
+		// if (!user) history.replace("/");
+	}, [history, user]);
 
 	return (
 		<Body>

@@ -41,6 +41,22 @@ app.post("/createNew", async (req, res) => {
 		.catch(() => res.sendStatus(403));
 });
 
+app.post("/createNewAnonymous", async (req, res) => {
+	const requestBody = req.body;
+	let url = requestBody.url;
+
+	if (!url.includes("http")) {
+		url = `https://${url}`;
+	}
+
+	serverDB
+		.createNewAnonUrl(requestBody.url)
+		.then(value => {
+			res.send(value);
+		})
+		.catch(() => res.sendStatus(403));
+});
+
 app.post("/createNewWithExpiry", async (req, res) => {
 	const requestBody = req.body;
 	let url = requestBody.url;
@@ -60,8 +76,6 @@ app.post("/createNewWithExpiry", async (req, res) => {
 
 app.get("/visit", async (req, res) => {
 	const { short, by } = req.query;
-	console.log(short, by);
-
 	const documents = await shortURL.find({ shortened: short });
 
 	if (documents.length > 0) {
@@ -80,9 +94,10 @@ app.get("/visit", async (req, res) => {
 		shortURL.updateOne(
 			{ shortened: short },
 			{ visitCount: documents[0].visitCount + 1, updatedAt: new Date() },
-			(err, response) => {
+			err => {
 				if (err) console.log(err);
 				else {
+					if (by === "anon") return;
 					const updateVisited = user.updateOne(
 						{ userName: by },
 						{
